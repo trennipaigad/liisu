@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111936">
+  <meta name="description" content="Lõbus mäng rooma numbrite harjutamiseks ühest kuni 3999-ni.">
+  <title>Rooma numbrite väljakutse</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%237c3aed'/%3E%3Cpath d='M17 17h12v6h-3v18h3v6H17v-6h3V23h-3zm18 0h6l5 18 5-18h7l-9 30h-7z' fill='white'/%3E%3C/svg%3E">
+  <style>
+    :root{--ink:#eef2ff;--muted:#aeb8d7;--night:#080d20;--panel:#111936;--line:#2a3764;--purple:#8b5cf6;--cyan:#22d3ee;--pink:#f472b6;--good:#34d399;--bad:#fb7185}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--ink);font:500 16px/1.5 ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,sans-serif;background:radial-gradient(circle at 12% 5%,#283270 0,transparent 28%),radial-gradient(circle at 90% 15%,#3c1d65 0,transparent 30%),var(--night);display:grid;place-items:center;padding:24px;overflow-x:hidden}
+    .shell{width:min(960px,100%)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.02em}.coin{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--purple),#5b21b6);box-shadow:0 8px 28px #7c3aed66;font-family:Georgia,serif;font-size:21px}
+    .scoreline{display:flex;gap:9px}.pill{border:1px solid var(--line);background:#111936cc;border-radius:999px;padding:8px 13px;color:var(--muted)}.pill strong{color:white}
+    .game{position:relative;overflow:hidden;background:linear-gradient(145deg,#151e40dd,#0d1430ee);border:1px solid #354374;border-radius:28px;box-shadow:0 25px 80px #0008;padding:clamp(22px,5vw,48px)}
+    .game:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,#0006,transparent);pointer-events:none}
+    .top{position:relative;display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:28px}
+    h1{font-size:clamp(28px,5vw,52px);line-height:1.04;margin:0;max-width:650px;letter-spacing:-.04em}.gradient{background:linear-gradient(90deg,#c4b5fd,var(--cyan));color:transparent;background-clip:text}
+    .level{min-width:150px}.level label{display:block;color:var(--muted);font-size:14px;margin-bottom:7px}select,input,button{font:inherit}select{width:100%;color:white;background:#0b1128;border:1px solid var(--line);border-radius:12px;padding:11px 36px 11px 12px}
+    .progress{height:9px;background:#080d20;border-radius:99px;overflow:hidden;margin-bottom:26px}.progress>i{display:block;height:100%;width:10%;border-radius:inherit;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .35s ease}
+    .card{position:relative;text-align:center;background:#0a1027bb;border:1px solid var(--line);border-radius:22px;padding:clamp(24px,5vw,42px)}
+    .prompt{margin:0 0 8px;color:var(--muted);font-size:15px;text-transform:uppercase;letter-spacing:.12em}.number{font-family:Georgia,"Times New Roman",serif;font-size:clamp(56px,11vw,104px);font-weight:700;line-height:1.15;margin:5px 0 26px;text-shadow:0 0 28px #8b5cf655}
+    .answer{display:flex;gap:12px;max-width:500px;margin:auto}.answer input{min-width:0;flex:1;text-align:center;text-transform:uppercase;letter-spacing:.14em;font-size:24px;font-weight:800;color:white;background:#111936;border:2px solid #394879;border-radius:15px;padding:14px;outline:none}.answer input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px #22d3ee22}.answer button,.next{border:0;border-radius:15px;padding:14px 21px;font-weight:850;color:#07101d;background:linear-gradient(135deg,var(--cyan),#67e8f9);cursor:pointer;box-shadow:0 8px 24px #22d3ee33}.answer button:hover,.next:hover{transform:translateY(-1px);filter:brightness(1.07)}
+    .feedback{min-height:30px;margin:18px 0 0;font-weight:750}.feedback.good{color:var(--good)}.feedback.bad{color:var(--bad)}
+    .hint{margin:22px 0 0;color:var(--muted);font-size:14px}.hint button{border:0;background:none;color:#c4b5fd;text-decoration:underline;cursor:pointer;padding:0}
+    .legend{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:18px}.legend span{text-align:center;border:1px solid var(--line);background:#101833;border-radius:12px;padding:9px 5px;color:var(--muted);font-size:13px}.legend b{display:block;color:white;font-family:Georgia,serif;font-size:18px}
+    .result{text-align:center;padding:22px 0}.result .trophy{font-size:70px}.result h2{font-size:36px;margin:8px 0}.result p{color:var(--muted)}.next{margin-top:12px}
+    .hidden{display:none}.pop{animation:pop .32s ease}@keyframes pop{50%{transform:scale(1.025)}}
+    @media(max-width:680px){body{padding:14px;place-items:start center}header{align-items:flex-start}.brand span:last-child{display:none}.scoreline{flex-wrap:wrap;justify-content:flex-end}.pill{padding:6px 10px;font-size:14px}.game{padding:20px;border-radius:22px}.top{display:block}.level{margin-top:18px}.answer{flex-direction:column}.answer button{width:100%}.legend{grid-template-columns:repeat(4,1fr)}.number{margin-bottom:18px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand"><span class="coin">IV</span><span>ROOMA NUMBRITE VÄLJAKUTSE</span></div>
+      <div class="scoreline"><span class="pill">Punkte <strong id="score">0</strong></span><span class="pill">Seeria <strong id="streak">0</strong> 🔥</span></div>
+    </header>
+    <section class="game" aria-live="polite">
+      <div id="play">
+        <div class="top"><h1>Muuda arv <span class="gradient">rooma numbriks</span></h1><div class="level"><label for="level">Raskusaste</label><select id="level"><option value="20">Kuni 20</option><option value="100" selected>Kuni 100</option><option value="1000">Kuni 1000</option><option value="3999">Kuni 3999</option></select></div></div>
+        <div class="progress" aria-label="Mängu edenemine"><i id="progress"></i></div>
+        <div class="card" id="card">
+          <p class="prompt">Kirjuta rooma numbritega</p><div class="number" id="number">29</div>
+          <form class="answer" id="form"><label class="hidden" for="answer">Vastus</label><input id="answer" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Sinu vastus" maxlength="15"><button type="submit">Kontrolli</button></form>
+          <p class="feedback" id="feedback"></p>
+          <p class="hint">Kas jäid hätta? <button type="button" id="hintBtn">Näita vihjet</button></p>
+        </div>
+        <div class="legend" aria-label="Rooma numbrite põhiväärtused"><span><b>I</b>1</span><span><b>V</b>5</span><span><b>X</b>10</span><span><b>L</b>50</span><span><b>C</b>100</span><span><b>D</b>500</span><span><b>M</b>1000</span></div>
+      </div>
+      <div id="result" class="result hidden"><div class="trophy">🏛️</div><h2>Väljakutse läbitud!</h2><p id="summary"></p><button class="next" id="again">Mängi uuesti</button></div>
+    </section>
+  </main>
+  <script>
+    const values=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+    const toRoman=n=>{let out='';for(const [v,r] of values){while(n>=v){out+=r;n-=v}}return out};
+    const $=id=>document.getElementById(id);let round=1,score=0,streak=0,current=29,locked=false;const total=10;
+    function nextNumber(){const max=+$('level').value;let n;do{n=Math.floor(Math.random()*max)+1}while(n===current);return n}
+    function render(){current=nextNumber();locked=false;$('number').textContent=current;$('answer').value='';$('answer').disabled=false;$('feedback').textContent='';$('feedback').className='feedback';$('progress').style.width=(round/total*100)+'%';$('answer').focus();$('card').classList.remove('pop');void $('card').offsetWidth;$('card').classList.add('pop')}
+    function finish(){ $('play').classList.add('hidden');$('result').classList.remove('hidden');$('summary').textContent=`Said ${score} punkti 100-st. Parim vastus sünnib harjutades!`}
+    $('form').addEventListener('submit',e=>{e.preventDefault();if(locked)return;const a=$('answer').value.trim().toUpperCase();if(!a){$('feedback').textContent='Kirjuta kõigepealt vastus.';$('feedback').className='feedback bad';return}locked=true;$('answer').disabled=true;const correct=toRoman(current);if(a===correct){streak++;score+=10;$('feedback').textContent=`Õige! ${current} = ${correct} 🎉`;$('feedback').className='feedback good'}else{streak=0;$('feedback').textContent=`Peaaegu! Õige vastus on ${correct}.`;$('feedback').className='feedback bad'}$('score').textContent=score;$('streak').textContent=streak;setTimeout(()=>{if(round++>=total)finish();else render()},1300)});
+    $('hintBtn').addEventListener('click',()=>{const r=toRoman(current);$('feedback').textContent=`Vihje: vastus algab tähega ${r[0]} ja selles on ${r.length} märki.`;$('feedback').className='feedback'});
+    $('level').addEventListener('change',()=>{round=1;score=0;streak=0;$('score').textContent=0;$('streak').textContent=0;render()});
+    $('again').addEventListener('click',()=>{round=1;score=0;streak=0;$('score').textContent=0;$('streak').textContent=0;$('result').classList.add('hidden');$('play').classList.remove('hidden');render()});
+    render();
+  </script>
+</body>
+</html>
